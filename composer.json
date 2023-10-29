@@ -1,0 +1,27 @@
+{
+    "name": "tommykrueger/piffy",
+    "type": "project",
+    "description": "Super Simple PHP framework",
+    "keywords": [
+        "php",
+        "framework"
+    ],
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Piffy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "tommykrueger",
+            "email": "info@tommykrueger.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
