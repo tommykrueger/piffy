@@ -1,5 +1,5 @@
 {
-    "name": "tommykrueger/piffy",
+    "name": "piffy/app",
     "type": "project",
     "description": "Super Simple PHP framework",
     "keywords": [
@@ -9,7 +9,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Piffy\\": "src/"
+            "App\\": "app/"
         }
     },
     "authors": [
