@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers;
+namespace Piffy\Helpers;
 
 use stdClass;
 
@@ -52,14 +52,6 @@ class DateHelper
         return self::$_instance;
     }
 
-    public function addLeadingZero($num)
-    {
-        if ($num <= 9) {
-            return '0' . $num;
-        }
-        return $num;
-    }
-
     public static function getReadableDate($date)
     {
         $time = strtotime($date);
@@ -67,6 +59,14 @@ class DateHelper
         $date = str_replace(self::$monthsEnglish, self::$monthsGerman, $date);
         // $date .= ' Uhr';
         return $date;
+    }
+
+    public function addLeadingZero($num)
+    {
+        if ($num <= 9) {
+            return '0' . $num;
+        }
+        return $num;
     }
 
     public function readableMonth($month)

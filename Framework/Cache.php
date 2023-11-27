@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Framework;
+namespace Piffy\Framework;
 class Cache
 {
 

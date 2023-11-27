@@ -1,32 +1,26 @@
 <?php
 
-namespace App\Framework;
+namespace Piffy\Framework;
 
-use App\Collections\PageCollection;
-use App\Controllers\PageController;
+use Piffy\Collections\PageCollection;
+use Piffy\Controllers\PageController;
 
 class Router
 {
 
-    private static $routes = array();
+    private static array $routes = [];
 
-    private static $redirects = array();
+    private static array $redirects = [];
 
     private function __construct()
     {
     }
-
-    private function __clone()
-    {
-    }
-
 
     public static function route($pattern, $callback)
     {
         $pattern = '/^' . str_replace('/', '\/', $pattern) . '$/';
         self::$routes[$pattern] = $callback;
     }
-
 
     public static function execute($url)
     {
@@ -71,7 +65,19 @@ class Router
         }
 
         header("HTTP/1.1 404 Not Found");
-        (new PageController)->render('404', PageCollection::getInstance()::getPageByName('404'));
+        (new PageController)->render('404', (new PageCollection())->getByName('404'));
+        exit;
+    }
+
+    /**
+     * @param $slug
+     * @param int $type
+     * @return void
+     */
+    public static function redirect($slug, int $type = 301): void
+    {
+        $url = DOMAIN . $slug;
+        header("Location: " . $url, true, $type);
         exit;
     }
 
@@ -85,15 +91,7 @@ class Router
         return self::$redirects;
     }
 
-    /**
-     * @param $slug
-     * @param int $type
-     * @return void
-     */
-    public static function redirect($slug, int $type = 301): void
+    private function __clone()
     {
-        $url = DOMAIN . $slug;
-        header("Location: " . $url, true, $type);
-        exit;
     }
 }

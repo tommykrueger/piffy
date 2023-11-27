@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Framework;
-
-use stdClass;
+namespace Piffy\Framework;
 
 class View
 {
@@ -11,9 +9,9 @@ class View
     {
     }
 
-    public static function render($name, $data = null)
+    public static function render($name, $data = null): void
     {
-        $data = $data ? (object)$data : new stdClass();
+        // $data = $data ? (object)$data : new stdClass();
 
         if ($name === '404') {
             $data->title = '404';
@@ -53,11 +51,11 @@ class View
         }
     }
 
-    public static function post($post, $data = null)
+    public static function post($file, $data = null): void
     {
-        $data = (object)$data;
-        $fileName = VIEWS_DIR . 'posts/' . $post->file . '.php';
-        $fileId = VIEWS_DIR . 'posts/' . $post->id . '.php';
+        // $data = (object)$data;
+        $fileName = VIEWS_DIR . 'posts/' . $file . '.php';
+        $fileId = VIEWS_DIR . 'posts/' . $file . '.php';
 
         if (is_file($fileName)) {
             include($fileName);

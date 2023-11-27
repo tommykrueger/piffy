@@ -1,78 +1,10 @@
 <?php
 
-namespace App\Framework;
+namespace Piffy\Framework;
 
-final class Autoloader
+class Autoloader
 {
     private array $namespaces;
-
-    public function registerNamespaces(array $namespaces): Autoloader
-    {
-        $this->namespaces = $namespaces;
-        return $this;
-    }
-
-    public function register(): void
-    {
-        spl_autoload_register([$this, 'make']);
-    }
-
-
-    public function make(string $class): void
-    {
-        $className = $class;
-        foreach ($this->namespaces as $namespace) {
-            // $prefix = 'App\\Framework\\';
-            $prefix = $namespace;
-            //print_r('namespace: ' . $namespace . '<br>');
-
-            if (!substr($className, 0, 17) === $prefix) {
-                // return;
-            }
-
-            $class = substr($className, strlen($prefix));
-            //print_r('D: ' . $class . '<br>');
-            $location = APP_DIR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
-
-            //print_r('location: ' . $location . '<br>');
-
-            if (is_file($location)) {
-                //print_r('LOAD: ' . $location . '<br>');
-                require_once($location);
-            }
-        }
-
-    }
-
-    /**
-     * Das eigentliche Autoloading.
-     *
-     * @param $name
-     */
-    public function handle(string $name): void
-    {
-        $parts = explode('\\', $name);
-        var_dump($this->namespaces[$parts[0]]);
-
-        // Den obersten Namensraum der Klasse prüfen
-        if (isset($this->namespaces[$parts[0]])) {
-            // ok wir sind zuständig
-            var_dump($this->namespaces[$parts[0]]);
-            exit;
-
-            // Zielpfad
-            $path = $this->namespaces[$parts[0]];
-
-            // den obersten Namensraum entfernen
-            array_shift($parts);
-
-            $fileName = $path . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts) . '.php';
-
-            if (file_exists($fileName)) {
-                require_once $fileName;
-            }
-        }
-    }
 
     public static function register2(array $directories): void
     {
@@ -155,5 +87,80 @@ final class Autoloader
             }
         });
         */
+    }
+
+    public function registerNamespaces(array $namespaces): autoloader
+    {
+        $this->namespaces = $namespaces;
+        return $this;
+    }
+
+    public function register(): void
+    {
+        spl_autoload_register([$this, 'make']);
+    }
+
+    public function make(string $class): void
+    {
+        $className = $class;
+        foreach ($this->namespaces as $namespace) {
+            // $prefix = 'App\\Framework\\';
+            $prefix = $namespace;
+            //print_r($prefix . '<br>');
+            //print_r('namespace: ' . $namespace . '<br>');
+
+            if (!substr($className, 0, 17) === $prefix) {
+                // return;
+            }
+
+
+            $class = substr($className, strlen($prefix));
+            //print_r($class . '<br>');
+            //print_r('D: ' . $class . '<br>');
+            $namespace_dir = str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+            //print_r($namespace_dir . '<br>');
+            // $namespace_dir = strtolower($namespace_dir);
+            //print_r($namespace_dir . '<br>');
+            $location = BASE_DIR . DIRECTORY_SEPARATOR . $namespace_dir . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
+
+            //print_r('location: ' . $location . '<br>');
+            //print_r($location . '<br>');
+
+            if (is_file($location)) {
+                //print_r('LOAD: ' . $location . '<br>');
+                require_once($location);
+            }
+        }
+
+    }
+
+    /**
+     * Das eigentliche Autoloading.
+     *
+     * @param $name
+     */
+    public function handle(string $name): void
+    {
+        $parts = explode('\\', $name);
+        var_dump($this->namespaces[$parts[0]]);
+
+        // Den obersten Namensraum der Klasse prüfen
+        if (isset($this->namespaces[$parts[0]])) {
+            // ok wir sind zuständig
+            var_dump($this->namespaces[$parts[0]]);
+            exit;
+
+            // Zielpfad
+            $path = $this->namespaces[$parts[0]];
+
+            // den obersten Namensraum entfernen
+            array_shift($parts);
+
+            $fileName = $path . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts) . '.php';
+
+            if (file_exists($fileName)) {
+                require_once $fileName;
+            }
+        }
     }
 }

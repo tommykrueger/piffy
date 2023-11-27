@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Helpers;
+namespace Piffy\Helpers;
 
-final class TextHelper
+class TextHelper
 {
     public static function getWordCount(string $content): int
     {

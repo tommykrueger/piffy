@@ -1,7 +1,7 @@
 <?php
 
-use App\Framework\View;
 use App\Models\Category;
+use Piffy\Framework\View;
 
 function partial(string $path, mixed $data = null): void
 {
@@ -150,17 +150,17 @@ function isPage($name): bool
 }
 
 
-function post($post, $data = null): void
+function post($file, $data = null): void
 {
-    View::post($post, $data);
-}
-
-function view($post, $data = null): void
-{
-    View::render($post, $data);
+    View::post($file, $data);
 }
 
 function getCategoryUrl($data, $fullPath = true): string
 {
     return Category::getUrl($data->id, $fullPath);
+}
+
+function view($post, $data = null): void
+{
+    View::view($post, $data);
 }

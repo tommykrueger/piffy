@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Framework;
+namespace Piffy\Framework;
 
 class Debug
 {
 
-    private static $start = 0;
+    private static int $start = 0;
 
     private function __construct()
     {
