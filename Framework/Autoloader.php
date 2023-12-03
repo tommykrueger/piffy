@@ -2,7 +2,7 @@
 
 namespace Piffy\Framework;
 
-class Autoloader
+final class Autoloader
 {
     private array $namespaces;
 
@@ -89,7 +89,7 @@ class Autoloader
         */
     }
 
-    public function registerNamespaces(array $namespaces): autoloader
+    public function registerNamespaces(array $namespaces): Autoloader
     {
         $this->namespaces = $namespaces;
         return $this;
@@ -106,25 +106,18 @@ class Autoloader
         foreach ($this->namespaces as $namespace) {
             // $prefix = 'App\\Framework\\';
             $prefix = $namespace;
-            //print_r($prefix . '<br>');
             //print_r('namespace: ' . $namespace . '<br>');
 
             if (!substr($className, 0, 17) === $prefix) {
                 // return;
             }
 
-
             $class = substr($className, strlen($prefix));
-            //print_r($class . '<br>');
             //print_r('D: ' . $class . '<br>');
             $namespace_dir = str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
-            //print_r($namespace_dir . '<br>');
-            // $namespace_dir = strtolower($namespace_dir);
-            //print_r($namespace_dir . '<br>');
             $location = BASE_DIR . DIRECTORY_SEPARATOR . $namespace_dir . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 
             //print_r('location: ' . $location . '<br>');
-            //print_r($location . '<br>');
 
             if (is_file($location)) {
                 //print_r('LOAD: ' . $location . '<br>');

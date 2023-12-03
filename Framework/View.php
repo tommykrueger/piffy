@@ -22,7 +22,7 @@ class View
         //exit;
     }
 
-    public static function view($name, $data = null)
+    public static function view($name, $data = null): void
     {
         $data = (object)$data;
         $file = VIEWS_DIR . $name . '.php';
@@ -40,7 +40,7 @@ class View
         }
     }
 
-    public static function news($id, $data = null)
+    public static function news($id, $data = null): void
     {
         $data = (object)$data;
         $file = VIEWS_DIR . 'news/' . $id . '.php';
@@ -66,7 +66,7 @@ class View
         }
     }
 
-    public static function job($id, $data = null)
+    public static function job($id, $data = null): void
     {
         $data = (object)$data;
         $file = VIEWS_DIR . '/jobs/' . $id . '.php';
@@ -75,7 +75,7 @@ class View
         }
     }
 
-    public static function person($name, $data = null)
+    public static function person($name, $data = null): void
     {
         $data = (object)$data;
         $file = VIEWS_DIR . '/persons/' . $name . '.php';

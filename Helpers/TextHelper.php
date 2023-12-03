@@ -2,7 +2,7 @@
 
 namespace Piffy\Helpers;
 
-class TextHelper
+final class TextHelper
 {
     public static function getWordCount(string $content): int
     {

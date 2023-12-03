@@ -2,26 +2,28 @@
 
 namespace Piffy\Framework;
 
-use Piffy\Collections\PageCollection;
-use Piffy\Controllers\PageController;
+use Piffy\Exceptions\RouteNotFoundException;
 
 class Router
 {
 
-    private static array $routes = [];
+    private static array $routes = array();
 
-    private static array $redirects = [];
+    private static array $redirects = array();
 
     private function __construct()
     {
     }
 
-    public static function route($pattern, $callback)
+    public static function route($pattern, $callback): void
     {
         $pattern = '/^' . str_replace('/', '\/', $pattern) . '$/';
         self::$routes[$pattern] = $callback;
     }
 
+    /**
+     * @throws RouteNotFoundException
+     */
     public static function execute($url)
     {
         // $url = rtrim($url,'/');
@@ -65,7 +67,7 @@ class Router
         }
 
         header("HTTP/1.1 404 Not Found");
-        (new PageController)->render('404', (new PageCollection())->getByName('404'));
+        throw new RouteNotFoundException('page not found');
         exit;
     }
 
@@ -81,12 +83,12 @@ class Router
         exit;
     }
 
-    public static function addRedirect($slug, $redirect)
+    public static function addRedirect($slug, $redirect): void
     {
         self::$redirects[$slug] = $redirect;
     }
 
-    public static function getRedirects()
+    public static function getRedirects(): array
     {
         return self::$redirects;
     }

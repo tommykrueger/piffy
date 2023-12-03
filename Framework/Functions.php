@@ -150,17 +150,17 @@ function isPage($name): bool
 }
 
 
-function post($file, $data = null): void
+function post($post, $data = null): void
 {
-    View::post($file, $data);
+    View::post($post, $data);
+}
+
+function view($post, $data = null): void
+{
+    View::render($post, $data);
 }
 
 function getCategoryUrl($data, $fullPath = true): string
 {
     return Category::getUrl($data->id, $fullPath);
-}
-
-function view($post, $data = null): void
-{
-    View::view($post, $data);
 }

@@ -4,25 +4,22 @@ namespace Piffy\Framework;
 
 class File
 {
-    private static $isActive = false;
-
-    private static $cachefile = null;
+    private static bool $isActive = false;
 
     private function __construct()
     {
     }
 
-    public static function getFileChangedDateTime(string $path, string $format = null): string
+    public static function getFileChangedDateTime($path, $format = null)
     {
-        $fileTime = filemtime($path);
-        $format = $format ?? 'Y-m-d H:i:s';
-
-        if ($fileTime) {
-            return date($format, $fileTime);
+        $filetime = filemtime($path);
+        $format = isset($format) ? $format : 'Y-m-d H:i:s';
+        if ($filetime) {
+            return date($format, $filetime);
         }
 
         // fallback
-        return date($format, strtotime('22. Sep 2023'));
+        return date($format, strtotime('21. Sep 2016'));
     }
 
 }

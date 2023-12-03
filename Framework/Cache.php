@@ -1,6 +1,7 @@
 <?php
 
 namespace Piffy\Framework;
+
 class Cache
 {
 
