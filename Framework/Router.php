@@ -6,6 +6,7 @@ use Piffy\Exceptions\RouteNotFoundException;
 
 class Router
 {
+    private static ?Router $_instance = null;
 
     private static array $routes = array();
 
@@ -13,6 +14,23 @@ class Router
 
     private function __construct()
     {
+        self::loadRedirects();
+    }
+
+    private function loadRedirects(): void
+    {
+        $file = APP_DIR . 'redirects.php';
+        if (is_file($file)) {
+            self::$redirects = include_once($file);
+        }
+    }
+
+    public static function getInstance(): Router
+    {
+        if (null === self::$_instance) {
+            self::$_instance = new static();
+        }
+        return self::$_instance;
     }
 
     public static function route($pattern, $callback): void
@@ -31,12 +49,8 @@ class Router
             $url = '/';
         }
 
-        if (isset(self::$redirects[$url])) {
-            // var_dump('redirect exists for ' . $url);
-            $pattern = self::$redirects[$url];
-            //var_dump('redirect pattern ' . $pattern);
-            self::redirect(DOMAIN . $pattern);
-        }
+        // check if there is a redirect for that route
+        self::checkRedirects($url);
 
         $lastChar = substr($url, -1);
         if ($lastChar !== '/' && false === stripos($url, '/ajax') && false === stripos($url, '/suche') && false === stripos($url, 'sitemap')) {
@@ -71,6 +85,28 @@ class Router
         exit;
     }
 
+    private static function checkRedirects(string $url): void
+    {
+        $connectedRedirects = array_filter(self::$redirects, function ($redirect) use ($url) {
+            return $redirect['from'] === $url;
+        });
+
+        if (empty($connectedRedirects)) {
+            return;
+        }
+
+        foreach ($connectedRedirects as $connectedRedirect) {
+            self::redirect($connectedRedirect['to'], $connectedRedirect['http_status']);
+        }
+
+        if (isset(self::$redirects[$url])) {
+            // var_dump('redirect exists for ' . $url);
+            $pattern = self::$redirects[$url];
+            //var_dump('redirect pattern ' . $pattern);
+            self::redirect(DOMAIN . $pattern);
+        }
+    }
+
     /**
      * @param $slug
      * @param int $type
@@ -78,7 +114,7 @@ class Router
      */
     public static function redirect($slug, int $type = 301): void
     {
-        $url = DOMAIN . $slug;
+        $url = str_contains($slug, 'http') ? $slug : DOMAIN . $slug;
         header("Location: " . $url, true, $type);
         exit;
     }
