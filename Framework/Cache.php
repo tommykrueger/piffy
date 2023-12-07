@@ -32,7 +32,7 @@ class Cache
             if ($file == '_') {
                 $file = '_homepage';
             }
-            self::$cachefile = BASE_DIR . 'cache/file' . $file . '.html';
+            self::$cachefile = BASE_DIR . '/public/cache/file' . $file . '.html';
             $cachetime = 60 * 60 * 12; // half day cache
 
             // Serve from the cache if it is younger than $cachetime
