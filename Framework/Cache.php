@@ -32,7 +32,7 @@ class Cache
             if ($file == '_') {
                 $file = '_homepage';
             }
-            self::$cachefile = APP_DIR . '/cache/file' . $file . '.html';
+            self::$cachefile = BASE_DIR . DS . 'cache/file' . $file . '.html';
             $cachetime = 60 * 60 * 12; // half day cache
 
             // Serve from the cache if it is younger than $cachetime
@@ -66,7 +66,7 @@ class Cache
             $url = str_replace([DOMAIN, 'http://', 'https://', '/'], '', $url);
             $url .= '.html';
 
-            $file = APP_DIR . 'cache/' . 'file_' . $url;
+            $file = BASE_DIR . DS . 'cache/' . 'file_' . $url;
 
             if (file_exists($file)) {
                 unlink($file);
