@@ -57,16 +57,14 @@ class Router
             Router::redirect($url . '/');
         }
 
-        Cache::start($url);
-
         foreach (self::$routes as $pattern => $callback) {
 
-            if (strpos($url, "?") !== false) {
-                $get_params = substr($url, strpos($url, "?"));
+            if (str_contains($url, "?")) {
+                $getParams = substr($url, strpos($url, "?"));
             }
 
-            if (isset($get_params) && !empty($get_params)) {
-                $url = str_replace($get_params, "", $url);
+            if (!empty($getParams)) {
+                $url = str_replace($getParams, "", $url);
             }
 
             // $url = rtrim($url,'/');
@@ -85,6 +83,10 @@ class Router
         exit;
     }
 
+    /**
+     * @param string $url
+     * @return void
+     */
     private static function checkRedirects(string $url): void
     {
         $connectedRedirects = array_filter(self::$redirects, function ($redirect) use ($url) {

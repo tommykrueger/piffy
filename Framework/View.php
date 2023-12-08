@@ -18,8 +18,6 @@ class View
         }
 
         include_once(VIEWS_DIR . $name . '.php');
-        Cache::end();
-        //exit;
     }
 
     public static function view($name, $data = null): void
