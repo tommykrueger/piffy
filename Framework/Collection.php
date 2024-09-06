@@ -70,7 +70,7 @@ class Collection
     /**
      * @return string
      */
-    final public function getSource(): string
+    public function getSource(): string
     {
         return $this->source;
     }
@@ -78,7 +78,7 @@ class Collection
     /**
      * @return string
      */
-    final public function getModel(): string
+    public function getModel(): string
     {
         return $this->model;
     }
@@ -95,7 +95,7 @@ class Collection
     /**
      * @return array
      */
-    final public function getAll(): array
+    public function getAll(): array
     {
         return $this->_data;
     }
@@ -103,7 +103,7 @@ class Collection
     /**
      * @return array
      */
-    final public function getAllRaw(): array
+    public function getAllRaw(): array
     {
         return $this->_rawData;
     }
@@ -112,7 +112,7 @@ class Collection
      * @param int $id
      * @return Model
      */
-    final public function getById(int $id): object
+    public function getById(int $id): object
     {
         $data = array_values(array_filter($this->_data, function ($d) use ($id) {
             return ($d->id === $id);
@@ -124,14 +124,14 @@ class Collection
      * @param array $ids
      * @return array
      */
-    final public function getByIds(array $ids = []): array
+    public function getByIds(array $ids = []): array
     {
         return array_values(array_filter($this->_data, function ($d) use ($ids) {
             return in_array($d->id, $ids, true);
         }));
     }
 
-    final public function getByName(string $name): Model
+    public function getByName(string $name): Model
     {
         $data = array_values(array_filter($this->_data, function ($d) use ($name) {
             return ($d->name === $name);

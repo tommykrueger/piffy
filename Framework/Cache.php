@@ -4,54 +4,66 @@ namespace Piffy\Framework;
 
 class Cache
 {
+    private static bool $isActive = false;
 
-    private static $isActive = false;
+    private static ?string $cacheFile = null;
 
-    private static $cachefile = null;
+    private static int $defaultCacheTime = 60 * 60 * 12;  // half day cache
 
     private function __construct()
     {
     }
 
-    public static function setActive($active = true)
+    public static function start(string $url, ?int $cacheTime): void
     {
-        self::$isActive = $active;
-    }
-
-    public static function start($url)
-    {
-
-        if (self::$isActive) {
-            //$time_elapsed_secs = microtime(true) - self::$start;
-            //echo '<!-- rendered in ' . round($time_elapsed_secs, 4) . ' seconds -->';
-
-            //$url = $_SERVER["SCRIPT_NAME"];
-            $urlParts = explode('/', $url);
-            $file = implode('_', $urlParts);
-
-            if ($file == '_') {
-                $file = '_homepage';
-            }
-            self::$cachefile = APP_DIR . '/cache/file' . $file . '.html';
-            $cachetime = 60 * 60 * 12; // half day cache
-
-            // Serve from the cache if it is younger than $cachetime
-            if (file_exists(self::$cachefile) && time() - $cachetime < filemtime(self::$cachefile)) {
-                readfile(self::$cachefile);
-                echo "<!-- cached copy @ " . date('H:i:s', filemtime(self::$cachefile)) . " -->\n";
-                Debug::endTime();
-                exit;
-            }
-
-            ob_start(); // Start the output buffer
+        if (!defined('CACHE_ACTIVE')) {
+            Error::warning('Constant CACHE_ACTIVE not set');
+            return;
         }
+
+        if (false === CACHE_ACTIVE) {
+            return;
+        }
+
+        //$time_elapsed_secs = microtime(true) - self::$start;
+        //echo '<!-- rendered in ' . round($time_elapsed_secs, 4) . ' seconds -->';
+
+        //$url = $_SERVER["SCRIPT_NAME"];
+        $urlParts = explode('/', $url);
+        $file = implode('_', $urlParts);
+
+        if ($file == '_') {
+            $file = '_homepage';
+        }
+
+        self::$cacheFile = BASE_DIR . '/public/cache/file_' . $file . '.html';
+        $cacheTime = $cacheTime ?? self::$defaultCacheTime;
+
+        // Serve from the cache if it is younger than $cachetime
+        if (file_exists(self::$cacheFile) && time() - $cacheTime < filemtime(self::$cacheFile)) {
+            readfile(self::$cacheFile);
+            echo "<!-- cached copy @ " . date('H:i:s', filemtime(self::$cacheFile)) . " -->\n";
+            Debug::endTime();
+            exit;
+        }
+
+        ob_start(); // Start the output buffer
     }
 
-    public static function end()
+    public static function end(): void
     {
-        if (self::$isActive) {
-            $cached = fopen(self::$cachefile, 'w');
-            //$data = self::minifyHTML(ob_get_contents());
+        if (!defined('CACHE_ACTIVE')) {
+            Error::warning('Constant CACHE_ACTIVE not set');
+            return;
+        }
+
+        if (false === CACHE_ACTIVE) {
+            return;
+        }
+
+        if (self::$cacheFile) {
+            $cached = fopen(self::$cacheFile, 'w');
+            // $data = self::minifyHTML(ob_get_contents());
             $data = ob_get_contents();
             fwrite($cached, $data);
             fclose($cached);
@@ -59,14 +71,13 @@ class Cache
         }
     }
 
-
-    public static function clear($url)
+    public static function clear($url): void
     {
         if ($url) {
             $url = str_replace([DOMAIN, 'http://', 'https://', '/'], '', $url);
             $url .= '.html';
 
-            $file = APP_DIR . 'cache/' . 'file_' . $url;
+            $file = BASE_DIR . 'public/cache/' . 'file_' . $url;
 
             if (file_exists($file)) {
                 unlink($file);
@@ -111,7 +122,6 @@ class Cache
             '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4', //$1 and $4 insert first white-space character found before/after attribute
         );
 
-        $body = preg_replace(array_keys($replace), array_values($replace), $data);
-        return $body;
+        return preg_replace(array_keys($replace), array_values($replace), $data);
     }
 }

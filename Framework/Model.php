@@ -64,4 +64,9 @@ class Model
     {
         return $this->name ?? '';
     }
+
+    public function get(string $propertyName): ?string
+    {
+        return $this->_data[$propertyName] ?? null;
+    }
 }

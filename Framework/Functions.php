@@ -84,10 +84,10 @@ function getTitle($data): string
 {
     if (has($data, 'seo_title')) {
         $string = $data->seo_title;
-    } elseif (has($data, 'title')) {
-        $string = $data->title ?? '';
-    } else {
+    } elseif (has($data, 'name')) {
         $string = $data->name;
+    } else {
+        $string = $data->title ?? '';
     }
     return encode($string);
 }

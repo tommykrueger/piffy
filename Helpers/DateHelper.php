@@ -10,7 +10,7 @@ class DateHelper
     protected static $_instance = null;
 
     protected static $monthsEnglish = [
-        'Jan',
+        'Jan', //danke
         'Feb',
         'Mar',
         'Apr',
