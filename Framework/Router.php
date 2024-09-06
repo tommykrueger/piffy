@@ -59,7 +59,7 @@ class Router
 
         $lastChar = substr($url, -1);
         if ($lastChar !== '/' && false === stripos($url, '/ajax') && false === stripos($url, '/suche') && false === stripos($url, 'sitemap')) {
-            // Router::redirect($url . '/');
+            Router::redirect($url . '/');
         }
 
         foreach (self::$routes as $pattern => $callback) {
@@ -83,8 +83,8 @@ class Router
             }
         }
 
-        // header("HTTP/1.1 404 Not Found");
-        throw new RouteNotFoundException('Route ' . $url . ' not found');
+        header("HTTP/1.1 404 Not Found");
+        throw new RouteNotFoundException('page not found');
         exit;
     }
 
@@ -95,7 +95,7 @@ class Router
     private static function checkRedirects(string $url): void
     {
         $connectedRedirects = array_filter(self::$redirects, function ($redirect) use ($url) {
-            return isset($redirect['from']) && $redirect['from'] === $url;
+            return $redirect['from'] === $url;
         });
 
         if (empty($connectedRedirects)) {

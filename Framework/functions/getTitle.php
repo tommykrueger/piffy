@@ -1,10 +1,9 @@
 <?php
 
 if (!function_exists('getTitle')) {
-    
+
     function getTitle($data): string
     {
-        
         if (has($data, 'seo_title')) {
             $string = $data->seo_title;
         } elseif (has($data, 'title')) {

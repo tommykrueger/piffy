@@ -21,10 +21,6 @@ class Cache
             return;
         }
 
-        if (false === CACHE_ACTIVE) {
-            return;
-        }
-
         //$time_elapsed_secs = microtime(true) - self::$start;
         //echo '<!-- rendered in ' . round($time_elapsed_secs, 4) . ' seconds -->';
 
@@ -54,10 +50,6 @@ class Cache
     {
         if (!defined('CACHE_ACTIVE')) {
             Error::warning('Constant CACHE_ACTIVE not set');
-            return;
-        }
-
-        if (false === CACHE_ACTIVE) {
             return;
         }
 
