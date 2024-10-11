@@ -7,9 +7,9 @@ use stdClass;
 class DateHelper
 {
 
-    protected static $_instance = null;
+    protected static ?DateHelper $_instance = null;
 
-    protected static $monthsEnglish = [
+    protected static array $monthsEnglish = [
         'Jan', //danke
         'Feb',
         'Mar',
@@ -24,7 +24,7 @@ class DateHelper
         'Dec',
     ];
 
-    protected static $monthsGerman = [
+    protected static array $monthsGerman = [
         'Januar',
         'Februar',
         'März',
@@ -38,6 +38,8 @@ class DateHelper
         'November',
         'Dezember',
     ];
+
+    private stdClass $birthday;
 
     private function __construct()
     {

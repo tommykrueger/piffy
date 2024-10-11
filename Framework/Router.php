@@ -59,7 +59,7 @@ class Router
 
         $lastChar = substr($url, -1);
         if ($lastChar !== '/' && false === stripos($url, '/ajax') && false === stripos($url, '/suche') && false === stripos($url, 'sitemap')) {
-            Router::redirect($url . '/');
+            // Router::redirect($url . '/');
         }
 
         foreach (self::$routes as $pattern => $callback) {
