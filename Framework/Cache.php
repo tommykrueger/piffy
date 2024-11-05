@@ -63,8 +63,8 @@ class Cache
 
         if (self::$cacheFile) {
             $cached = fopen(self::$cacheFile, 'w');
-            // $data = self::minifyHTML(ob_get_contents());
-            $data = ob_get_contents();
+            $data = self::minifyHTML(ob_get_contents());
+            // $data = ob_get_contents();
             fwrite($cached, $data);
             fclose($cached);
             ob_end_flush(); // Send the output to the browser

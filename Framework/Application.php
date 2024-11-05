@@ -10,10 +10,11 @@ class Application
 {
     public string $configFile = BASE_DIR . DS . 'config.php';
 
+    public array $serviceInstances = [];
+
     public function __construct()
     {
         // @todo register classes
-
     }
 
     public function init(): void
@@ -25,6 +26,7 @@ class Application
         require_once($this->configFile);
 
         $this->loadGlobalFunctions();
+        // $this->registerServices();
     }
 
     public function run(): void
@@ -49,6 +51,43 @@ class Application
                 include_once $file;
             }
         }
+    }
+
+    private function registerService(): void
+    {
+        $serviceFiles = glob(BASE_DIR . DS . 'Piffy' . DS .'Services' . DS . '*.php');
+        if ($serviceFiles) {
+            foreach ($serviceFiles as $file) {
+                var_dump($file);
+                include_once $file;
+                // include_once PLUGINS_DIR . DS . 'Services' . DS . $file . '.php';
+
+                try {
+
+                    //$namespace = "Piffy\Services\\";
+                    $filename = pathinfo($file);
+                    //var_dump($filename);
+                    //$f = $namespace . $filename['filename'];
+                    new $filename['filename'];
+                } catch (Exception $e) {
+                    Log::warning($e->getMessage());
+                }
+
+                // $this->services[] = new EmailService();
+            }
+        }
+    }
+
+    public function registerServices(array $serviceList = []): void
+    {
+        foreach ($serviceList as $service) {
+            $this->serviceInstances[$service::class] = $service;
+        }
+    }
+
+    public static function getServiceInstance(string $serviceName)
+    {
+        return self::$serviceInstances[$serviceName];
     }
 }
 

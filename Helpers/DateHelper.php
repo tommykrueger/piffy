@@ -2,6 +2,7 @@
 
 namespace Piffy\Helpers;
 
+use DateTime;
 use stdClass;
 
 class DateHelper
@@ -84,6 +85,19 @@ class DateHelper
     public function getMonthsBetweenDates($dateEnd, $dateStart)
     {
         return abs((date('Y', $dateEnd) - date('Y', $dateStart)) * 12 + (date('m', $dateEnd) - date('m', $dateStart)));
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function getDaysBetweenDates($dateA, $dateB): int
+    {
+        $earlier = new DateTime($dateA);
+        $later = new DateTime($dateB);
+
+        // $neg_diff = $later->diff($earlier)->format("%r%a"); //-3
+        return $earlier->diff($later)->format("%r%a"); // 3
+
     }
 
 }
