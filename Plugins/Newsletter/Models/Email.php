@@ -7,7 +7,6 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Email
 {
-
     protected $recipient;
 
     protected $emailTemplate;

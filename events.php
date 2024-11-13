@@ -1,11 +1,11 @@
 <?php
 
+use Piffy\Enum\Events;
 use Piffy\EventListener\PostVotedListener;
-use Piffy\Services\EventService;
 
 return [
 
-    EventService::POST_VOTED => [
+    Events::POST_VOTED => [
         PostVotedListener::class
     ],
 
