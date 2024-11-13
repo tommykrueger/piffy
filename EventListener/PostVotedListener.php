@@ -8,6 +8,6 @@ class PostVotedListener
 {
     public function __invoke($event): void
     {
-         Cache::clear($event->getFileName());
+        Cache::clear($event->getFileName());
     }
 }

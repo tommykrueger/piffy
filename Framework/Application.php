@@ -5,7 +5,6 @@ namespace Piffy\Framework;
 use App\Collections\PageCollection;
 use App\Controllers\PageController;
 use Piffy\Exceptions\RouteNotFoundException;
-use Piffy\Framework\EventManager;
 use Piffy\Services\EventService;
 
 class Application
