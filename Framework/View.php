@@ -51,7 +51,7 @@ class View
 
     public static function post($file, $data = null): void
     {
-        // $data = (object)$data;
+        $data = (object)$data;
         $fileName = VIEWS_DIR . 'posts/' . $file . '.php';
         $fileId = VIEWS_DIR . 'posts/' . $file . '.php';
 

@@ -5,12 +5,16 @@ namespace Piffy\Framework;
 use App\Collections\PageCollection;
 use App\Controllers\PageController;
 use Piffy\Exceptions\RouteNotFoundException;
+use Piffy\Framework\EventManager;
+use Piffy\Services\EventService;
 
 class Application
 {
     public string $configFile = BASE_DIR . DS . 'config.php';
 
     public array $serviceInstances = [];
+
+    private EventService $eventService;
 
     public function __construct()
     {
@@ -22,16 +26,15 @@ class Application
         if (!file_exists($this->configFile)) {
             exit('Error: Config file does not exist: ' . $this->configFile);
         }
-
         require_once($this->configFile);
-
-        $this->loadGlobalFunctions();
-        // $this->registerServices();
     }
 
     public function run(): void
     {
         Debug::startTime();
+
+        $this->loadGlobalFunctions();
+        $this->registerEvents();
 
         try {
             Router::execute($_SERVER['REQUEST_URI']);
@@ -88,6 +91,25 @@ class Application
     public static function getServiceInstance(string $serviceName)
     {
         return self::$serviceInstances[$serviceName];
+    }
+
+    private function registerEvents(): void
+    {
+        $this->eventService = new EventService();
+
+        $file = BASE_DIR . DS . 'Piffy' . DS . 'events.php';
+        if (!file_exists($file)) {
+            return;
+        }
+
+        $events = include_once $file;
+
+        foreach ($events as $event => $eventListeners) {
+            foreach ($eventListeners as $eventListener) {
+                EventService::registerEventListener($event, $eventListener);
+            }
+        }
+
     }
 }
 

@@ -77,7 +77,7 @@ class Cache
             $url = str_replace([DOMAIN, 'http://', 'https://', '/'], '', $url);
             $url .= '.html';
 
-            $file = BASE_DIR . 'public/cache/' . 'file_' . $url;
+            $file = BASE_DIR . '/public/cache/' . 'file_' . $url;
 
             if (file_exists($file)) {
                 unlink($file);

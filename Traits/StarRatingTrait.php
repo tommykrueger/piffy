@@ -12,7 +12,7 @@ trait StarRatingTrait {
     /**
      * @return void
      */
-    private function loadRating(): void
+    private function loadStarRating(): void
     {
         $voteFile = USERDATA_DIR . '/star-rating/post_' . $this->getId() . '.json';
         $voteFileData = @file_get_contents($voteFile);
