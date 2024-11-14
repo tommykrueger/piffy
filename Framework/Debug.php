@@ -38,4 +38,9 @@ class Debug
         var_dump($data);
         echo '</pre>';
     }
+
+    public static function dump(mixed $data): void
+    {
+        echo sprintf('<pre>%s</pre>', print_r($data,true));
+    }
 }
