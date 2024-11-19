@@ -2,16 +2,14 @@
 
 namespace Piffy\Plugins\Newsletter\Models;
 
-use Plugins\Newsletter\Models\NewsletterSubscriber;
-use function Plugins\Newsletter\Models\render;
+use Piffy\Plugins\Newsletter\Models\Subscriber;
 
 include('Subscriber.php');
 include('Email.php');
 
 class Newsletter
 {
-
-    protected $response = [];
+    protected array $response = [];
 
     public function __construct()
     {
@@ -21,7 +19,7 @@ class Newsletter
         // send the newsletter for every subscriber in chunks
     }
 
-    public static function getNonsense()
+    public static function getNonsense(): string
     {
         @session_start();
         $nonsense = sha1('th15_I5_@_great_WÄBSITE_' . time());
@@ -30,7 +28,7 @@ class Newsletter
         return $nonsense;
     }
 
-    public function processForm()
+    public function processForm(): void
     {
         @session_start();
 
@@ -95,7 +93,7 @@ class Newsletter
                 'message' => 'Bitte schauen Sie in Ihr E-Mail-Postfach und bestätigen Sie Ihren Newsletter durch Klick auf den Link.'
             ];
 
-            // also send a email to the admin
+            // also send email to the admin
             $email = new Email((object)[
                 'recipient' => 'newsletter@lachvegas.de',
                 'subject' => 'Neuer Newsletter Abonnent' . $requestData->email,
@@ -135,7 +133,7 @@ class Newsletter
             $token = $_REQUEST['token'];
 
             // find the token of the subscription;
-            $subscriber = NewsletterSubscriber::findByToken($token);
+            $subscriber = Subscriber::findByToken($token);
 
             if (isset($subscriber->id)) {
                 render('newsletter_activation_success', []);

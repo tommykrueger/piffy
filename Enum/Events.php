@@ -5,4 +5,6 @@ namespace Piffy\Enum;
 class Events
 {
     public const POST_VOTED = 'POST_VOTED';
+
+    public const NEWSLETTER_SUBSCRIBED = 'NEWSLETTER_SUBSCRIBED';
 }

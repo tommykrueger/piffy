@@ -2,69 +2,61 @@
 
 namespace Piffy\Plugins\Newsletter\Models;
 
-class Subscriber
+use Piffy\Framework\Model;
+use Piffy\Traits\CryptographyTrait;
+
+class Subscriber extends Model
 {
+    use CryptographyTrait;
 
-    protected $data;
+    public const STATUS_SUBSCRIBED = 'subscribed';
 
-    protected $file = null;
+    public const STATUS_UNSUBSCRIBED = 'unsubscribed';
 
-    public function __construct()
+    public const STATUS_REGISTERED = 'registered';
+
+    private string $dirName = USERDATA_DIR . DS . 'subscribers';
+
+    /*
+    public function __get($property): ?string
     {
-        $this->loadData();
-    }
-
-    private function loadData()
-    {
-        $this->file = APP_DIR . '/data/' . md5($this->email . time()) . '.json';
-        $fileData = @file_get_contents($this->file);
-        if ($fileData) {
-            $this->data = json_decode($fileData);
+        if ($property === 'email') {
+            return $this->decrypt($this->data[$property]);
         }
+        return $this->data[$property] ?? null;
     }
+    */
 
-    public function findByToken($token)
+    public function save(): void
     {
-        $subscribers = array_values(array_filter($this->data, function ($subscriber) use ($token) {
-            return $token === $subscriber->token;
-        }));
+        //$this->file = PLUGINS_DIR . '/newsletter/data/' . md5($this->data['email'] . time()) . '.json';
+        //@file_put_contents($this->file, json_encode($this->data));
 
-        if (count($subscribers) === 1) {
-            $subscriber = $subscribers[0];
-            return (object)$subscriber;
+        if (!is_dir($this->dirName)) {
+            mkdir($this->dirName);
         }
-        return false;
+
+        $fileName = 'subscriber_' . date('Y-m-d_H-i-s') . '_' . uniqid() . '.json';
+        $file = $this->_data['file'] ?? $this->dirName . DS . $fileName;
+
+        $this->_data['created'] = date('Y-m-d_H-i-s');
+        $this->_data['updated'] = date('Y-m-d_H-i-s');
+
+        @file_put_contents($file, json_encode($this->_data));
     }
 
-    public function save()
+    public function set(string $key, string $value): Subscriber
     {
-        $this->file = PLUGINS_DIR . '/newsletter/data/' . md5($this->data['email'] . time()) . '.json';
-        @file_put_contents($this->file, json_encode($this->data));
+        $this->_data[$key] = $value;
+        return $this;
     }
 
-    public function exists($email)
+    public function getEmail(): ?string
     {
-        var_dump($this->data);
-        exit;
-        $subscribers = array_values(array_filter($this->data, function ($subscriber) use ($email) {
-            return $email === $subscriber->email;
-        }));
-        return (count($subscribers) >= 1);
-    }
-
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    public function setData(array $data): void
-    {
-        $d = [
-            'created' => date('Y-m-d H:i:s')
-        ];
-
-        $data = array_merge($d, $data);
-        $this->data = $data;
+        if ($this->_data['email']) {
+            $this->_data['email'] = $this->decrypt($this->_data['email']);
+        }
+        return null;
     }
 
 }

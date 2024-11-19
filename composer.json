@@ -12,5 +12,7 @@
             "email": "piffy@tommykrueger.com"
         }
     ],
-    "require": {}
+    "require": {
+      "ext-fileinfo": "*"
+    }
 }

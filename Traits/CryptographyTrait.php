@@ -12,7 +12,7 @@ trait CryptographyTrait {
 // need to be Encrypted
 
 // Display the original string
-        echo "Original String: " . $string;
+        //echo "Original String: " . $string;
 
 // Store the cipher method
         $ciphering = "AES-128-CTR";
@@ -40,7 +40,7 @@ trait CryptographyTrait {
         $ciphering = "AES-128-CTR";
 
         // Display the encrypted string
-        echo "Encrypted String: " . $string . "\n";
+        //echo "Encrypted String: " . $string . "\n";
 
 // Non-NULL Initialization Vector for decryption
         $decryption_iv = '1234567891011121';
@@ -52,7 +52,7 @@ trait CryptographyTrait {
         $decryption = openssl_decrypt ($string, $ciphering, $decryption_key, $options, $decryption_iv);
 
 // Display the decrypted string
-        echo "Decrypted String: " . $decryption;
+        //echo "Decrypted String: " . $decryption;
 
         return $decryption;
 

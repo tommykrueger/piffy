@@ -7,6 +7,6 @@ if (!function_exists('postLink')) {
 
     function postLink(array $postIds = []): void
     {
-        View::partial('related-link', ['ids' => $postIds]);
+        View::partial('related-links', ['ids' => $postIds]);
     }
 }
