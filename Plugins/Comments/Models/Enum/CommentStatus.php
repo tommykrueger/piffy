@@ -1,6 +1,6 @@
 <?php
 
-namespace Piffy\Plugins\Models\Enum;
+namespace Piffy\Plugins\Comments\Models\Enum;
 
 class CommentStatus
 {
