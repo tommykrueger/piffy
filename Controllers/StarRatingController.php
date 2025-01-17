@@ -2,7 +2,7 @@
 
 namespace Piffy\Controllers;
 
-use App\Collections\PostCollection;
+use Piffy\Collections\PostCollection;
 use Exception;
 use Piffy\Plugins\Newsletter\Models\Email;
 use stdClass;

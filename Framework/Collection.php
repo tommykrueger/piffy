@@ -112,12 +112,12 @@ class Collection
      * @param int $id
      * @return Model
      */
-    public function getById(int $id): object
+    public function getById(int $id): ?Model
     {
-        $data = array_values(array_filter($this->_data, function ($d) use ($id) {
+        $data = array_values(array_filter($this->getAll(), function ($d) use ($id) {
             return ($d->id === $id);
         }));
-        return (object)$data[0] ?? (object)[];
+        return $data[0] ?? null;
     }
 
     /**
@@ -126,9 +126,19 @@ class Collection
      */
     public function getByIds(array $ids = []): array
     {
+        /*
         return array_values(array_filter($this->_data, function ($d) use ($ids) {
             return in_array($d->id, $ids, true);
         }));
+        */
+
+        $found = [];
+        foreach ($ids as $id) {
+            $found[] = $this->getById($id);
+        }
+
+        return $found;
+
     }
 
     public function getByName(string $name): Model

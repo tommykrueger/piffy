@@ -35,6 +35,12 @@ class View
         $file = PARTIALS_DIR . $name . '.php';
         if (file_exists($file)) {
             include($file);
+        } else {
+            // try for svg
+            $file = PARTIALS_DIR . $name . '.svg';
+            if (file_exists($file)) {
+                include($file);
+            }
         }
     }
 

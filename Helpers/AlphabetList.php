@@ -1,11 +1,10 @@
 <?php
 
-
 namespace Piffy\Helpers;
+
 class AlphabetList
 {
-
-    protected static $list = [
+    protected static array $list = [
         '0-9',
         'a',
         'b',

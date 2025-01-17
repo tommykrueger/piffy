@@ -3,38 +3,62 @@
 namespace Piffy\Models;
 
 use App\Collections\CategoryCollection;
-use App\Collections\PostCollection;
 use App\Models\PostImage;
-use Exception;
-use Piffy\Framework\Cache;
+use Piffy\Collections\PostCollection;
 use Piffy\Framework\File;
 use Piffy\Framework\Model;
 use Piffy\Framework\View;
 use Piffy\Helpers\TextHelper;
-use Piffy\Plugins\Newsletter\Models\Email;
+use Piffy\Plugins\Comments\Models\Enum\CommentStatus;
+use Piffy\Services\SchemaService;
 use stdClass;
 
 class Post extends Model
 {
+    public string $schema = 'post';
+
+    public int $id = 0;
+    public string $title = '';
+    public string $subtitle = '';
+    public string $seo_title = '';
+    public string $slug = '';
+    public string $excerpt = '';
+
+    public bool $repeatable = false;
+
+
+
+    public string $created = '';
+    public string $modified = '';
+
     public PostImage $postImage;
 
-    public ?string $image = null;
-    public ?string $image2x = null;
+    public bool $toBreadCrumbAdded = false;
 
     // the number of words in the content
-    protected bool $toBreadCrumbAdded = false;
-    protected array $response = array(
-        'message' => '',
-        'status' => true
-    );
-    private int $wordCount;
-    private string $readingTime;
+    public int $wordCount = 0;
+
+    public string $readingTime = '';
+
+    public string|false $image = '';
+    public string|false $image2x = '';
+
+
+    public array $relatedPosts = [];
+
+    public array $categories = [];
+
+    public object $comments;
+
+    public string $createdDate;
 
     public function __construct(array $properties = [])
     {
         parent::__construct($properties);
-        $this->prepareData();
 
+        // $this->prepareData();
+
+        $this->modified = $this->getModifiedDate();
         $this->postImage = new PostImage();
         if (!empty($this->image)) {
             if (!str_contains($this->image, 'http')) {
@@ -43,14 +67,70 @@ class Post extends Model
                 $this->image2x = $this->postImage->getImageSizeUrl($image, 1200, 676);
             }
         }
+
+        $this->loadVotes();
+       //  $this->loadWordCount();
+        $this->setReadingTime();
     }
 
+
+    /**
+     * Load all extra data required for this model
+     *
+     * @return void
+     */
     public function prepareData(): void
     {
         $this->loadWordCount();
         $this->setReadingTime();
         $this->loadVotes();
+        $this->loadRelatedPosts();
+        $this->loadComments();
+
+        // $this->loadCategories();
+        // $this->loadRelations();
+
+        // @todo
+        // loadComments
+        // loadPostLikes
+        // loadPostListLikes
+        // loadRelatedPosts
+        // load Tags
+        // load Categories
+        // load Authors
     }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function getUrl(): ?string
+    {
+        return DOMAIN . $this->slug;
+    }
+
+    public function getCreated(): string
+    {
+        return $this->created ?? '';
+    }
+
+    public function getModified(): string
+    {
+        return $this->getModifiedDate() ?? '';
+    }
+
+    public function getCanonical(): string
+    {
+        $url = $this->getSlug();
+
+        if (substr($url, -1, 1) === '/') {
+            $url = substr($url, 0, -1);
+        }
+
+        return DOMAIN . $url . '.html';
+    }
+
 
     private function loadWordCount(): void
     {
@@ -58,23 +138,25 @@ class Post extends Model
         View::post($this->getFileName());
         $content = ob_get_clean();
         $this->wordCount = TextHelper::getWordCount($content); // str_word_count(strip_tags($content));
-    }
+        ob_clean();
 
-    public function getFileName(): string
-    {
-        return is_file(VIEWS_DIR . 'posts' . DS . $this->getId() . '.php')
-            ? $this->getId()
-            : $this->getName();
-    }
 
-    public function getWordCount(): int
-    {
-        return $this->wordCount;
-    }
+        /*
+        if ($this->getFileName()) {
+            $data = file_get_contents($this->getFilePath());
+            $this->wordCount = TextHelper::getWordCount($data);
+        }
+        */
 
-    private function setReadingTime()
-    {
-        $this->readingTime = ceil($this->wordCount / 250);
+
+        // Specify the file path
+        //$file_path = 'path/to/your/file.txt';
+        // Read the file content
+        //$file_content = file_get_contents($file_path);
+        // Count the words
+
+        // Display the word count
+        // echo "The file contains $word_count words.";
     }
 
     private function loadVotes(): void
@@ -91,24 +173,37 @@ class Post extends Model
         }
     }
 
-    public function getCreated(): string
+    public function getFileName(): string
     {
-        return $this->created ?? '';
+        $folder = VIEWS_DIR . 'posts' . DS;
+        if (is_file($folder . $this->getId() . '.php')) {
+            return $this->getId();
+        }
+
+        if (is_file($folder . $this->getName() . '.php')) {
+            return $this->getName();
+        }
+
+        if (is_file($folder . $this->getFileNameFromSlug() . '.php')) {
+            return $this->getFileNameFromSlug();
+        }
+
+        return '';
     }
 
-    public function getModified(): string
+    public function getWordCount(): int
     {
-        return $this->getModifiedDate() ?? '';
+        return $this->wordCount;
+    }
+
+    public function getCreatedDateFormatted(): string
+    {
+        return date('d.m.Y', strtotime($this->created));
     }
 
     public function getModifiedDate(): string
     {
         return File::getFileChangedDateTime($this->getFilePath(), 'Y-m-d H:i:s');
-    }
-
-    public function getFilePath(): string
-    {
-        return VIEWS_DIR . 'posts' . DS . $this->getFileName() . '.php';
     }
 
     public function getModifiedDateFormatted(): string
@@ -117,20 +212,9 @@ class Post extends Model
         return File::getFileChangedDateTime($this->getFilePath(), 'd.m.Y');
     }
 
-    public function getCanonical(): string
+    public function getFilePath(): string
     {
-        $url = $this->getSlug();
-
-        if (substr($url, -1, 1) === '/') {
-            $url = substr($url, 0, -1);
-        }
-
-        return DOMAIN . $url . '.html';
-    }
-
-    public function getSlug(): ?string
-    {
-        return $this->slug;
+        return VIEWS_DIR . 'posts' . DS . $this->getFileName() . '.php';
     }
 
     public function getFileNameFromSlug(): string
@@ -138,12 +222,17 @@ class Post extends Model
         return str_replace('/', '', $this->getSlug());
     }
 
-    public function getUrl(): ?string
+    private function setReadingTime(): void
     {
-        return DOMAIN . $this->slug;
+        $this->readingTime = ceil($this->wordCount / 250) . ' min';
     }
 
-    public function generateImage($data = null, $isAjax = true)
+    public function getCategories(): array
+    {
+        return CategoryCollection::getInstance()->getByIds($this->categories);
+    }
+
+    public function generateImage($data = null, $isAjax = true): bool
     {
         //$params = isset($_REQUEST['params']) ? $_REQUEST['params'] : [];
 
@@ -177,11 +266,6 @@ class Post extends Model
         return true;
     }
 
-    private function respond()
-    {
-        echo json_encode($this->response);
-        exit;
-    }
 
     private function createPostImage($post)
     {
@@ -201,7 +285,7 @@ class Post extends Model
         $options->slug = $post->id;
 
         if (isset($post->categories[0])) {
-            $slug = CategoryCollection::getInstance()::getCategorySlugById($post->categories[0]);
+            $slug = CategoryCollection::getCategorySlugById($post->categories[0]);
             if (file_exists(APP_DIR . 'public/img/categories/' . $slug . '.jpg')) {
                 $options->bgImage = APP_DIR . 'public/img/categories/' . $slug . '.jpg';
             }
@@ -223,117 +307,14 @@ class Post extends Model
 
     }
 
-    public function savePageView($id)
-    {
-        $requestData = $_REQUEST['data'];
-        $requestData = json_decode(html_entity_decode(stripslashes($requestData)), false);
 
-        // save the vote to local file
-        $dataFile = APP_DIR . '/data/user-generated/pageviews/post/' . $id . '.json';
-        $dataFileContent = @file_get_contents($dataFile);
 
-        if ($dataFileContent) {
-            $data = json_decode($dataFileContent);
-        }
-        if (!isset($data)) {
-            $data = new stdClass();
-            $data->pageviews = 0;
-        }
-
-        if (isset($requestData->type)) {
-            $data->pageviews++;
-        }
-
-        @file_put_contents($dataFile, json_encode($data));
-        Cache::clear($_SERVER['HTTP_REFERER']);
-
-        $this->response['status'] = true;
-        $this->respond();
-    }
-
-    /**
-     * Add a like to a certain list entry of a post
-     * @param $id
-     * @return void
-     */
-    public function addListLike($id)
-    {
-        $data = $_REQUEST['data'];
-        $data = json_decode(html_entity_decode(stripslashes($data)), false);
-
-        @session_start();
-        $IP = $_SERVER['REMOTE_ADDR'];
-
-        // save the vote to local file
-        $file = APP_DIR . '/data/user-generated/list-likes/' . $id . '.json';
-        $fileData = @file_get_contents($file);
-
-        if (!$fileData) {
-            $fileDataObject = new stdClass();
-        } else {
-            $fileDataObject = json_decode($fileData);
-        }
-
-        $val = 1;
-        if (isset($fileDataObject->{$data->name})) {
-            $val = (int)$fileDataObject->{$data->name} + 1;
-        }
-        $fileDataObject->{$data->name} = $val;
-
-        @file_put_contents($file, json_encode($fileDataObject));
-        Cache::clear($_SERVER['HTTP_REFERER']);
-
-        try {
-            $post = PostCollection::getInstance()::getPost($id);
-            $emailData['id'] = $id;
-            $emailData['post'] = $post;
-            $emailData['likes'] = $val;
-            $emailData['name'] = $data->name;
-            $email = new Email((object)[
-                'recipient' => 'info@lachvegas.de',
-                'emailData' => (object)$emailData,
-                'subject' => 'New Like #' . date('Y-m-d'),
-                'emailTemplate' => 'post_list_like',
-            ]);
-            $email->send();
-        } catch (Exception $e) {
-
-        }
-
-        $this->response['status'] = true;
-        $this->respond();
-    }
-
-    /**
-     * Adds a like to a certain entry of a post list
-     * @param $id
-     * @todo implement this
-     */
-    public function postEntryLike($id)
-    {
-        $data = $_REQUEST['data'];
-        $d = json_decode(html_entity_decode(stripslashes($data)), false);
-
-        @session_start();
-        $IP = $_SERVER['REMOTE_ADDR'];
-
-        // save the vote to local file
-
-        Cache::clear($_SERVER['HTTP_REFERER']);
-
-        $this->response['status'] = true;
-        $this->respond();
-    }
 
     public function getReadingTime(): string
     {
         return $this->readingTime;
     }
 
-    public function getTitleRawText(): string
-    {
-        return encode(strip_tags($this->getTitle()));
-    }
 
     public function getTitle(): string
     {
@@ -350,82 +331,95 @@ class Post extends Model
         return $title;
     }
 
+    public function getTitleRawText(): string
+    {
+        return encode(strip_tags($this->getTitle()));
+    }
+
     private function getSEOTitle()
     {
         return $this->_data['seo_title'] ?? '';
     }
 
-    public function postVote($id): void
+    public function loadRelatedPosts(): Post
     {
-        $data = $_REQUEST['data'];
-        $d = json_decode(html_entity_decode(stripslashes($data)), false);
-
-        @session_start();
-        $IP = $_SERVER['REMOTE_ADDR'];
-
-        // save the vote to local file
-        $voteFile = USERDATA_DIR . '/votes/post_' . $id . '.json';
-        $voteFileData = @file_get_contents($voteFile);
-
-        if ($voteFileData) {
-            $votes = json_decode($voteFileData);
-        }
-
-        if (!isset($votes)) {
-            $votes = new stdClass();
-            $votes->up = 0;
-            $votes->down = 0;
-        }
-
-        if (isset($d->vote_up)) {
-            $postVotesUp = $votes->up;
-
-            if (!is_numeric($postVotesUp)) {
-                $postVotesUp = 0;
-            }
-
-            $postVotesUp++;
-            $votes->up = $postVotesUp;
-            $this->response['vote_up'] = true;
-            $this->response['votes'] = $postVotesUp;
-        } else if (isset($d->vote_down)) {
-            $postVotesDown = $votes->down;
-
-            if (!is_numeric($postVotesDown)) {
-                $postVotesDown = 0;
-            }
-
-            $postVotesDown++;
-            $votes->down = $postVotesDown;
-
-            $this->response['vote_down'] = true;
-            $this->response['votes'] = $postVotesDown;
-        }
-
-
-        @file_put_contents($voteFile, json_encode($votes));
-
-        $post = PostCollection::getInstance()->getPost((int)$id);
-
-        try {
-            $emailData['id'] = $id;
-            $emailData['post'] = $post;
-            $emailData['likes'] = $votes->up;
-            $email = new Email((object)[
-                'recipient' => 'info@lachvegas.de',
-                'emailData' => (object)$emailData,
-                'subject' => 'New Post Like #' . date('Y-m-d'),
-                'emailTemplate' => 'post_like',
-            ]);
-            $email->send();
-
-            // Cache::clear($post->getSlug());
-        } catch (Exception $e) {
-
-        }
-
-        $this->response['status'] = true;
-        $this->respond();
+        $this->relatedPosts = PostCollection::getInstance()->getRelatedPosts($this);
+        $this->relatedPosts = array_slice($this->relatedPosts,0, 8);
+        return $this;
     }
 
+    public function loadComments(): Post
+    {
+        $commentsFile = USERDATA_DIR . '/comments/post_' .  $this->getId() .  '.json';
+        $commentsFileData = @file_get_contents($commentsFile);
+
+        if ($commentsFileData) {
+            $this->comments = json_decode($commentsFileData);
+
+            $this->comments->comments = array_values(array_filter($this->comments->comments, function ($comment) {
+                if ($comment->status === CommentStatus::PUBLIC) {
+                    return true;
+                }
+                return false;
+            }));
+
+            usort($this->comments->comments, function($a, $b){
+                return ($a->created < $b->created);
+            });
+        }
+
+        return $this;
+    }
+
+    public function loadRelations(): void
+    {
+        $schema = SchemaService::getInstance()->getSchemas($this->schema);
+
+        if (isset($schema->relations)) {
+            foreach ($schema->relations as $relation) {
+                $relation = (object)$relation;
+                //var_dump($relation);
+
+                $model = $relation->model;
+
+                    //var_dump($model);
+
+                    $prop = $this->get($relation->property);
+
+                    //var_dump($prop);
+
+                    if (!isset($relation->collection)) {
+                        continue;
+                    }
+
+
+                    if (is_array($prop)) {
+                        $this->{$relation->property} = [];
+
+                        foreach ($prop as $item) {
+
+                            $this->{$relation->property}[] = $relation->collection::getInstance()->getById($item);
+                        }
+                    }
+
+                    //var_dump($prop);
+
+
+            }
+        }
+    }
+
+    public function loadCategories(): void
+    {
+        if (empty($this->categories)) {
+            return;
+        }
+        for($i=0; $i<count($this->categories); $i++) {
+            $cat = CategoryCollection::getInstance()->getById($this->categories[$i]);
+            if (!$cat) {
+
+            }
+            $this->categories[$i] = $cat;
+        }
+    }
 }

@@ -1,0 +1,39 @@
+{
+  "model": "Post",
+  "collection": "PostCollection",
+  "relations": [
+    {
+      "model": "Image",
+      "collection": "Piffy\\Collections\\PostCollection",
+      "type": "hasOne",
+      "property": "image",
+      "target_property": "name"
+    },
+    {
+      "model": "App\\Models\\Category",
+      "collection": "App\\Collections\\CategoryCollection",
+      "type": "belongsTo",
+      "property": "categories",
+      "target_property": "id"
+    },
+    {
+      "model": "Post",
+      "type": "hasMany",
+      "property": "posts",
+      "target_property": "id"
+    },
+    {
+      "model": "Tag",
+      "type": "hasMany",
+      "property": "tags",
+      "target_property": "id"
+    },
+    {
+      "model": "Comment",
+      "collection": "Piffy\\Collections\\CommentsCollection",
+      "type": "hasMany",
+      "property": "comments",
+      "target_property": "id"
+    }
+  ]
+}

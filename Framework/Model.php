@@ -65,7 +65,7 @@ class Model
         return $this->name ?? '';
     }
 
-    public function get(string $propertyName): ?string
+    public function get(string $propertyName): mixed
     {
         return $this->_data[$propertyName] ?? null;
     }

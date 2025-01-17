@@ -19,11 +19,11 @@ star-rating {
   color: black;
   text-align: center;
   border-radius: 4px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
   text-transform: uppercase;
-  background: linear-gradient(180deg, #fff, #f0f0f0);
+  background: linear-gradient(180deg, #fff, var(--border-color));
   transition: all 150ms ease-in-out;
   box-shadow: rgba(0,0,0,.35) 0 3px 6px;
 }
@@ -34,7 +34,7 @@ star-rating {
   margin-right: 10px;
   border-radius: 50%;
   font-style: normal;
-  background-color: #f0f0f0;
+  background-color: var(--border-color);
 }
 .star-rating span {
   width: 32px;

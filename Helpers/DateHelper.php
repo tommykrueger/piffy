@@ -11,7 +11,7 @@ class DateHelper
     protected static ?DateHelper $_instance = null;
 
     protected static array $monthsEnglish = [
-        'Jan', //danke
+        'Jan',
         'Feb',
         'Mar',
         'Apr',
