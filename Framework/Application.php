@@ -54,7 +54,7 @@ class Application
         $this->registerSchemas();
 
         $this->loadGlobalFunctions();
-        $this->registerRoutes();
+        // $this->registerRoutes();
         $this->registerEvents();
 
         $file = BASE_DIR . DS . 'Piffy' . DS . 'constants.php';

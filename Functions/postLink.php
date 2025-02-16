@@ -1,7 +1,7 @@
 <?php
 
 use Piffy\Framework\View;
-use Piffy\Collections\PostCollection;
+use App\Collections\PostCollection;
 
 if (!function_exists('postLink')) {
 

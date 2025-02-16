@@ -9,8 +9,8 @@ if (!function_exists('getExcerpt'))
         }
 
         //$string = strip_tags($string);
-        //$string = strip_tags($string);
-        return $string;
+        $string = strip_tags($string);
+        // return $string;
         return preg_replace('/((\w+[\W|\s]*){'.($words-1).'}\w+|\W|\s)(?:(.*|\s))/', '${1}', $string) . '' . $end;
     }
 }

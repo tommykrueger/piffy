@@ -1,7 +1,7 @@
 <?php
 
-use Piffy\Collections\PostCollection;
-use Piffy\Controllers\PostController;
+use App\Collections\PostCollection;
+use App\Controllers\PostController;
 use Piffy\Framework\Router;
 
 $posts = PostCollection::getInstance()->getAll();

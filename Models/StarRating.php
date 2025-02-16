@@ -2,7 +2,7 @@
 
 namespace Piffy\Models;
 
-use Piffy\Collections\PostCollection;
+use App\Collections\PostCollection;
 use Piffy\Framework\Model;
 use Piffy\Plugins\Newsletter\Models\Email;
 use Piffy\Plugins\StarRating\Models\Exception;

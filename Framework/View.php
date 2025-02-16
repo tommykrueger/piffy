@@ -51,7 +51,7 @@ class View
         if (file_exists($file)) {
             include($file);
         } else {
-            echo 'Inhalt folgt..';
+            echo $data->content ?? '';
         }
     }
 
